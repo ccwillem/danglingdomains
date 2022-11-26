@@ -4,22 +4,22 @@
 Dangling domains are subdomains that have a CNAME record but the resource it refers to does not exist anymore. If these resource referred to in the CNAME is a third-party resource like Azure, GCP or AWS, this resource can be created by anybody and the subdomain is thereby hijacked.
 
 ## Installation
-'''
+```
 git clone https://github.com/ccwillem/danglingdomains.git
 cd ./danglingdomains
 pip3 install -r requirements.txt
-'''
+```
 
 ## Usage
 Use the -d option to specify a domain to search for. Subdomains are gathered from crt.sh.
-'''
+```
 python3 danglingdomains.py -d example.com
-'''
+```
 
 Use the -l option to provide a list of subdomains in a file, one per line.
-'''
+```
 python3 danglingdomains.py -l path/to/file.txt
-'''
+```
 
 ## Options
 The following options are available.
