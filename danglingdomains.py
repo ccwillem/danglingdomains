@@ -6,29 +6,23 @@ import dns.resolver, dns.exception, dns.rdatatype
 import sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-d", "--domain", action="store", help="enter the domain to search for.")
-parser.add_argument("-l", "--list", action="store", help="path to file containing list with subdomains, separated by newlines.")
-parser.add_argument("-v", "--verbose", action="store_true", help="show verbose output of each subdomain, CNAME and IP address.")
-parser.add_argument("-j", "--json", action="store_true", help="show output in json format. Only dangling domains will be shown, no verbose info will be included.")
+parser.add_argument("-d", "--domain", action="store", help="enter the domain to search for")
+parser.add_argument("-l", "--list", action="store", help="path to file containing list with subdomains, separated by newlines")
+parser.add_argument("-v", "--verbose", action="store_true", help="show verbose output of each subdomain, CNAME and IP address")
+parser.add_argument("-j", "--json", action="store_true", help="show output in json format. Only dangling domains will be shown, no verbose info will be included")
 
 args = parser.parse_args()
 
-search_domain = args.domain ## list of positional first arguments: domain name
+search_domain = args.domain
 input_list = []
 json_dangling = {'danglingDomains': []}
+
 
 if not search_domain and not args.list:
     print('Specify input domain or a file with subdomains')
     quit()
 
-if args.list:
-    with open(args.list, 'r') as f:
-        first_line = f.readline()
-        lines = f.readlines()
-    non_empty_lines = [line.strip() for line in lines if line.strip() != ""] ## remove empty lines, and leading and trailing whitespace
-    input_list += non_empty_lines ## append targets from input list file to targets from command line input
-    uniq_input_list = list(set(input_list))
-    results = uniq_input_list
+
 if not args.json:
     print('''
      ,-""""-.
@@ -46,6 +40,24 @@ if not args.json:
 
 Find forgotten subdomains that are still floating in the air....
 ''')
+
+
+if args.list:
+    with open(args.list, 'r') as f:
+        first_line = f.readline()
+        lines = f.readlines()
+    non_empty_lines = [line.strip() for line in lines if line.strip() != ""]
+    input_list += non_empty_lines
+    uniq_input_list = list(set(input_list))
+    results = uniq_input_list
+    if args.verbose:
+            print(f"\033[93m[ + ]\033[0m   In total \033[92m{len(results)}\033[0m unique subdomains are listed in file\n")
+            print("\033[93m[ + ]\033[0m    Checking for CNAME's...\n")
+    else:
+        if not args.json:
+            print(f"{len(results)} subdomains to check\n")
+
+
 if args.domain:
     crt_url = "https://crt.sh/?Identity="+search_domain+"&output=json"
     if args.verbose:
@@ -54,7 +66,7 @@ if args.domain:
         response = requests.get(crt_url)
         if response.status_code == 200 and response.text:
             if args.verbose:
-                print("\033[93m[ + ]\033[0m   Successfully retrieved domains and subdomains\n")
+                print("\033[93m[ + ]\033[0m   Successfully retrieved subdomains\n")
         else:
             if args.verbose:
                 print("\033[91m[ - ]\033[0m   Error collecting information")
@@ -74,7 +86,6 @@ if args.domain:
             if validators.domain(subdomain) == True:
                 results.append(subdomain)
         results = list(set(results))
-        # print(results)
         if args.verbose:
             print(f"\033[93m[ + ]\033[0m   In total \033[92m{len(results)}\033[0m subdomains have been discovered for \033[92m{search_domain}\033[0m\n")
             print("\033[93m[ + ]\033[0m    Checking for CNAME's...\n")
@@ -82,9 +93,11 @@ if args.domain:
             if not args.json:
                 print(f"{len(results)} subdomains founds\n")
 
+
 domain_with_cname=[]
 dangling = []
 json_list =[]
+
 
 if len(results) != 0:
     for sub in results:
@@ -108,7 +121,11 @@ if len(results) != 0:
                         continue               
         except dns.exception.DNSException:
             pass
+
+
 json_dangling['danglingDomains'] = json_list
+
+
 if args.json:
     print(json.dumps(json_dangling, indent=4))
 else:
