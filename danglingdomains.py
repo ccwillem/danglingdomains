@@ -1,3 +1,7 @@
+#!/bin/python3
+#
+# Author ccwillem
+
 import requests
 import json
 import argparse
