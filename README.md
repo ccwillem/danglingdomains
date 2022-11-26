@@ -22,10 +22,12 @@ python3 danglingdomains.py -l path/to/file.txt
 ```
 
 ## Options
-The following options are available.
+The following options are available:
 
-  -h, --help          	show this help message and exit.
-  -d, --domain DOMAIN	enter the domain to search for.
-  -l, --list LIST  		path to file containing list with subdomains, separated by newlines.
-  -v, --verbose         show verbose output of each subdomain, CNAME and IP address.
-  -j, --json            show output in json format. Only dangling domains will be shown, no verbose info will be included.
+Short format	| Long format	| Description
+-------------	| ------------- | -------------
+-d           	| --domain      | enter the domain to search for
+-l			 	| --list		| path to file containing list with subdomains, separated by newlines
+-v				| --verbose		| show verbose output of each subdomain, CNAME and IP address
+-j				| --json		| show output in json format. Only dangling domains will be shown, no verbose info will be included
+-h				| --help		| show the help message and exi
