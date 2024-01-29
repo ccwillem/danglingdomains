@@ -113,13 +113,14 @@ json_list =[]
 
 def cname_lookup(sub):
     try:
-        answer = dns.resolver.resolve(sub, "CNAME")
+        resolver = dns.resolver.Resolver()
+        answer = resolver.query(sub, "CNAME")
         if answer:
             domain_with_cname.append(sub)
             for rdata in answer:
                 cname = rdata.target
                 try:
-                    address = dns.resolver.resolve(cname, "A")
+                    address = resolver.query(cname, "A")
                     for data in address:
                         ip = data.address
                         if args.verbose:
@@ -135,8 +136,6 @@ def cname_lookup(sub):
     except dns.exception.DNSException:
         pass
 
-
-
 if len(results) != 0:
     pbar = tqdm(total=len(results), colour="yellow")
     with ThreadPoolExecutor(max_workers=50) as pool:
@@ -145,10 +144,6 @@ if len(results) != 0:
             pbar.update(n=1)    
     pool.shutdown()
             
-        
-
-        
-
 json_dangling['danglingDomains'] = json_list
 if args.json:
     print(json.dumps(json_dangling, indent=4))
@@ -163,10 +158,4 @@ else:
             for each in dangling:
                 tqdm.write(f"\033[91m{each}\033[0m")
             tqdm.write("\n")
-
-
-
-
-
-
 
